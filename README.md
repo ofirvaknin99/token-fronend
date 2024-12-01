@@ -6,11 +6,7 @@ The frontend is built with React and TypeScript, utilizing Ant Design (Antd) for
 
 ## Frontend - Tech Stack
 
-React: A JavaScript library for building user interfaces.
-TypeScript: For enhanced type safety and development efficiency.
-Ant Design (Antd): Component library for a polished, professional UI.
-React Router: For implementing routing in the application.
-Axios: For handling HTTP requests to the backend.
+React, TypeScript, Ant Design (Antd), React Router, Axios
 
 ## Steps to run the project
 
