@@ -1,42 +1,46 @@
+import { UseQueryOptions, useQuery } from "@tanstack/react-query";
 import { Button, Input, Tree, message } from "antd";
-import React, { useState } from "react";
-import { fetchRepositoryTree } from "../services/githubService";
-import { AntdTreeNode } from "../types/common";
+import React, { useEffect, useState } from "react";
+import { REPO_TREE_KEY, fetchRepositoryTree } from "../services/githubService";
+import { AntdTreeNode, TreeNode } from "../types/common";
 import { transformTreeToAntdFormat } from "../utils/treeTransformer";
+import { isGitUrlValid } from "../utils/validation";
 
 const RepositoryTreePage: React.FC = () => {
   const [repoUrl, setRepoUrl] = useState<string>("");
-  const [treeData, setTreeData] = useState<AntdTreeNode[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [shouldFetch, setShouldFetch] = useState(false);
 
-  const isGitUrlValid = (): boolean => {
-    if (!repoUrl) {
-      message.error("Please enter a GitHub repository URL");
-      return false;
-    }
-    const githubUrlPattern = /^https?:\/\/github\.com\/[\w-]+\/[\w.-]+\/?$/;
-    if (!githubUrlPattern.test(repoUrl)) {
-      message.error("Invalid GitHub repository URL. Ensure it follows the format: https://github.com/owner/repo");
-      return false;
-    }
-    return true;
+  const queryOptions: UseQueryOptions<TreeNode, Error> = {
+    queryKey: [REPO_TREE_KEY, repoUrl],
+    queryFn: () => fetchRepositoryTree(repoUrl),
+    enabled: shouldFetch,
   };
 
-  const handleFetchRepositoryTree = async () => {
-    if (isGitUrlValid()) {
-      setIsLoading(true);
-      try {
-        const fetchedTree = await fetchRepositoryTree(repoUrl);
-        const transformedTree: AntdTreeNode[] = [transformTreeToAntdFormat(fetchedTree)];
-        setTreeData(transformedTree);
-        message.success("Repository tree fetched successfully");
-      } catch (error) {
-        message.error("Failed to fetch repository tree");
-      } finally {
-        setIsLoading(false);
-      }
+  const { data: fetchedTree, isLoading, error } = useQuery(queryOptions);
+  const treeData: AntdTreeNode[] = fetchedTree ? [transformTreeToAntdFormat(fetchedTree)] : [];
+
+  const handleFetchRepositoryTree = () => {
+    const { isValid, errorMessage } = isGitUrlValid(repoUrl);
+    if (isValid) {
+      setShouldFetch(true);
+    } else if (errorMessage) {
+      message.error(errorMessage);
     }
   };
+
+  useEffect(() => {
+    if (fetchedTree) {
+      message.success("Repository tree fetched successfully");
+      setShouldFetch(false);
+    }
+  }, [fetchedTree]);
+
+  useEffect(() => {
+    if (error && shouldFetch) {
+      message.error("Failed to fetch repository tree");
+      setShouldFetch(false);
+    }
+  }, [error, shouldFetch]);
 
   return (
     <>

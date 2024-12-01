@@ -2,6 +2,7 @@ import axios from "axios";
 import { TreeNode, TreeNodeSchema } from "../types/common";
 
 const BASE_API_URL = process.env.REACT_APP_BASE_API_URL || "http://localhost:8000";
+export const REPO_TREE_KEY = "repositoryTree";
 
 export const fetchRepositoryTree = async (repoUrl: string): Promise<TreeNode> => {
   try {
