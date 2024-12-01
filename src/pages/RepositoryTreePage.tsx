@@ -9,22 +9,32 @@ const RepositoryTreePage: React.FC = () => {
   const [treeData, setTreeData] = useState<AntdTreeNode[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleFetchRepositoryTree = async () => {
+  const isGitUrlValid = (): boolean => {
     if (!repoUrl) {
       message.error("Please enter a GitHub repository URL");
-      return;
+      return false;
     }
+    const githubUrlPattern = /^https?:\/\/github\.com\/[\w-]+\/[\w.-]+\/?$/;
+    if (!githubUrlPattern.test(repoUrl)) {
+      message.error("Invalid GitHub repository URL. Ensure it follows the format: https://github.com/owner/repo");
+      return false;
+    }
+    return true;
+  };
 
-    setIsLoading(true);
-    try {
-      const fetchedTree = await fetchRepositoryTree(repoUrl);
-      const transformedTree: AntdTreeNode[] = [transformTreeToAntdFormat(fetchedTree)];
-      setTreeData(transformedTree);
-      message.success("Repository tree fetched successfully");
-    } catch (error) {
-      message.error("Failed to fetch repository tree");
-    } finally {
-      setIsLoading(false);
+  const handleFetchRepositoryTree = async () => {
+    if (isGitUrlValid()) {
+      setIsLoading(true);
+      try {
+        const fetchedTree = await fetchRepositoryTree(repoUrl);
+        const transformedTree: AntdTreeNode[] = [transformTreeToAntdFormat(fetchedTree)];
+        setTreeData(transformedTree);
+        message.success("Repository tree fetched successfully");
+      } catch (error) {
+        message.error("Failed to fetch repository tree");
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
