@@ -1,12 +1,10 @@
-### Tree Of Files Fullstack Assignment - Token Security
+# Tree Of Files Fullstack Assignment - Token Security
 
 This project is the frontend implementation of the Token Security Fullstack Assignment.
 The application allows users to explore the file structure of any public GitHub repository by entering the repository URL.
 The frontend is built with React and TypeScript, utilizing Ant Design (Antd) for UI components and modern libraries for routing and data management.
 
-## Tech Stack
-
-## Frontend
+## Frontend - Tech Stack
 
 React: A JavaScript library for building user interfaces.
 TypeScript: For enhanced type safety and development efficiency.
